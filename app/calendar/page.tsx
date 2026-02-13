@@ -7,17 +7,18 @@ function toDateKey(d: Date) {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams?: { year?: string; month?: string; eventId?: string; itemId?: string };
+  searchParams?: Promise<{ year?: string; month?: string; eventId?: string; itemId?: string }>;
 }) {
+  const resolvedSearchParams = (await searchParams) ?? {};
   const allEvents = await getEvents();
   const reservations = await getReservations();
   const items = await getItems();
 
   const now = new Date();
-  const qsYear = searchParams?.year ? parseInt(searchParams.year, 10) : now.getFullYear();
-  const qsMonth = searchParams?.month ? parseInt(searchParams.month, 10) - 1 : now.getMonth(); // month in query is 1-based
-  const filterEventId = searchParams?.eventId ? parseInt(searchParams.eventId, 10) : undefined;
-  const filterItemId = searchParams?.itemId ? parseInt(searchParams.itemId, 10) : undefined;
+  const qsYear = resolvedSearchParams.year ? parseInt(resolvedSearchParams.year, 10) : now.getFullYear();
+  const qsMonth = resolvedSearchParams.month ? parseInt(resolvedSearchParams.month, 10) - 1 : now.getMonth(); // month in query is 1-based
+  const filterEventId = resolvedSearchParams.eventId ? parseInt(resolvedSearchParams.eventId, 10) : undefined;
+  const filterItemId = resolvedSearchParams.itemId ? parseInt(resolvedSearchParams.itemId, 10) : undefined;
 
   const year = qsYear;
   const month = qsMonth;
