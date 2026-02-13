@@ -15,7 +15,6 @@ export default function Navigation() {
           <Link href="/" className="text-xl font-bold text-slate-900">
             SFBBO Inventory Tracker
           </Link>
-          <p className="text-xs text-slate-500">Inventory, reservations, events, and booking calendar</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
