@@ -1,10 +1,40 @@
 "use client";
 
-import { addItem } from "@/actions/inventory";
-import { useState } from "react";
+import { addItem, getItems } from "@/actions/inventory";
+import { useEffect, useState } from "react";
 
 export default function AddItemForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadCategories() {
+      try {
+        const existingItems = await getItems();
+        const categories = Array.from(
+          new Set(
+            existingItems
+              .map((item) => item.category?.trim())
+              .filter((category): category is string => Boolean(category))
+          )
+        ).sort((first, second) => first.localeCompare(second));
+
+        if (isActive) {
+          setCategoryOptions(categories);
+        }
+      } catch {
+        // keep form usable even if suggestions fail to load
+      }
+    }
+
+    loadCategories();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);
@@ -44,9 +74,15 @@ export default function AddItemForm() {
             id="category"
             name="category"
             required
+            list="category-options"
             placeholder="e.g., Equipment, Supplies"
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          <datalist id="category-options">
+            {categoryOptions.map((category) => (
+              <option key={category} value={category} />
+            ))}
+          </datalist>
         </div>
 
         <div>
