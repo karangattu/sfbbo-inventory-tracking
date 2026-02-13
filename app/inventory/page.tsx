@@ -29,7 +29,7 @@ export default async function InventoryPage() {
       </div>
 
       <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Add New Item</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Item</h2>
         <AddItemForm />
       </div>
 

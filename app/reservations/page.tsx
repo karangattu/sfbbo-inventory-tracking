@@ -13,7 +13,7 @@ export default async function ReservationsPage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Reservations</h1>
 
       <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Create New Reservation</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Create New Reservation</h2>
         <CreateReservationForm />
       </div>
 

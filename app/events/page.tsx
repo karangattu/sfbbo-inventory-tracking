@@ -16,7 +16,7 @@ export default async function EventsPage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Upcoming Events</h1>
 
       <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Add New Event</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Event</h2>
         <AddEventForm />
       </div>
 

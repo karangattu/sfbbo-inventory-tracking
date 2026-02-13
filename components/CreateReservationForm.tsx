@@ -59,7 +59,7 @@ export default function CreateReservationForm() {
             name="itemId"
             required
             onChange={(e) => setSelectedItem(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select an item</option>
             {items.map((item) => (
@@ -78,7 +78,7 @@ export default function CreateReservationForm() {
             id="eventId"
             name="eventId"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select an event</option>
             {events.map((event) => (
@@ -101,7 +101,7 @@ export default function CreateReservationForm() {
             min="1"
             max={available}
             defaultValue="1"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {selectedItem && (
             <p className="text-sm text-gray-600 mt-1">

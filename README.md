@@ -2,39 +2,6 @@
 
 A full-stack inventory management system built for SFBBO (San Francisco Bay Bird Observatory) to track equipment, manage reservations, and plan for upcoming events.
 
-## Features
-
-### 📦 Inventory Management
-- Add and manage inventory items with descriptions
-- Organize items by category
-- Track storage locations
-- View real-time availability
-- Delete items when no longer needed
-
-### 📅 Event Management
-- Create and manage upcoming events
-- Date and time tracking with validation
-- Location information
-- Automatic filtering of past events
-
-### 🔖 Reservation System
-- Reserve items for specific events
-- Automatic availability checking
-- Track reservation status (reserved/returned)
-- Add condition notes when marking items as returned
-- Prevent over-booking with real-time availability calculation
-
-## Tech Stack
-
-- **Framework**: Next.js 14 with App Router
-- **Language**: TypeScript
-- **Database**: Turso (with local SQLite fallback)
-- **ORM**: Drizzle ORM
-- **Styling**: Tailwind CSS
-- **Server Actions**: Built-in Next.js Server Actions for type-safe mutations
-
-## Getting Started
-
 ### Prerequisites
 
 - Node.js 18.x or higher
