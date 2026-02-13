@@ -1,14 +1,12 @@
 "use client";
 
-import { createReservation, getItems, getEvents, getAvailableQuantity } from "@/actions/inventory";
+import { createReservation, getItems, getEvents } from "@/actions/inventory";
 import { useState, useEffect } from "react";
 
 export default function CreateReservationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [items, setItems] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
-  const [selectedItem, setSelectedItem] = useState<number | null>(null);
-  const [available, setAvailable] = useState<number>(0);
 
   useEffect(() => {
     async function loadData() {
@@ -26,20 +24,12 @@ export default function CreateReservationForm() {
     loadData();
   }, []);
 
-  useEffect(() => {
-    if (selectedItem) {
-      getAvailableQuantity(selectedItem).then(setAvailable);
-    }
-  }, [selectedItem]);
-
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);
     try {
       await createReservation(formData);
       // Reset form
       (document.getElementById("create-reservation-form") as HTMLFormElement)?.reset();
-      setSelectedItem(null);
-      setAvailable(0);
     } catch (error) {
       alert(error instanceof Error ? error.message : "Failed to create reservation");
     } finally {
