@@ -78,9 +78,20 @@ export default function CalendarDayCard({
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="mt-2 inline-flex text-[11px] font-medium text-blue-600 underline md:hidden"
+              className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 hover:text-blue-800"
+              aria-label={`View details for ${fullDateLabel}`}
             >
-              Tap to view all details
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-3.5 w-3.5"
+                aria-hidden="true"
+              >
+                <path d="M10 3c-4.5 0-8.26 2.91-9.54 6.94a1 1 0 000 .61C1.74 14.59 5.5 17.5 10 17.5s8.26-2.91 9.54-6.94a1 1 0 000-.61C18.26 5.91 14.5 3 10 3zm0 11a4 4 0 110-8 4 4 0 010 8z" />
+                <path d="M10 8a2 2 0 100 4 2 2 0 000-4z" />
+              </svg>
+              View details
             </button>
           </>
         ) : (
@@ -124,7 +135,7 @@ export default function CalendarDayCard({
       )}
 
       {isModalOpen && hasBookings && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 md:hidden" onClick={() => setIsModalOpen(false)}>
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4" onClick={() => setIsModalOpen(false)}>
           <div className="mt-14 w-full max-w-md rounded-xl bg-white p-4 shadow-2xl" onClick={(event) => event.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-base font-semibold text-slate-900">{fullDateLabel}</h3>
