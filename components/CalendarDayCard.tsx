@@ -50,9 +50,13 @@ export default function CalendarDayCard({
 
         {hasBookings ? (
           <>
-            <div className="mb-2 flex items-center justify-between text-[11px] text-slate-500">
-              <span>{events.length} event{events.length === 1 ? "" : "s"}</span>
-              <span>{reservations.length} reservation{reservations.length === 1 ? "" : "s"}</span>
+            <div className="mb-2 flex flex-wrap items-center gap-1.5 text-[11px]">
+              <span className="inline-flex whitespace-nowrap rounded bg-slate-100 px-1.5 py-0.5 font-medium text-slate-600">
+                {events.length} event{events.length === 1 ? "" : "s"}
+              </span>
+              <span className="inline-flex whitespace-nowrap rounded bg-slate-100 px-1.5 py-0.5 font-medium text-slate-600">
+                {reservations.length} reservation{reservations.length === 1 ? "" : "s"}
+              </span>
             </div>
 
             <div className="space-y-1.5 text-xs">
