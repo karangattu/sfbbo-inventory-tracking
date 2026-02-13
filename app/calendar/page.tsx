@@ -80,7 +80,7 @@ export default async function CalendarPage({
 
       <div className="mb-6 flex items-center justify-between">
         <p className="text-sm text-gray-600">
-          Shows events and reserved items for the selected month. Click an event/reservation for details.
+          Shows events and reserved items for the selected month. Hover or focus a day card to view all bookings.
         </p>
 
         <form method="get" className="flex items-center space-x-3">
@@ -116,29 +116,96 @@ export default async function CalendarPage({
           const key = toDateKey(day);
           const dayEvents = eventsByDate[key] || [];
           const dayReservations = reservationsByDate[key] || [];
+          const previewEvents = dayEvents.slice(0, 2);
+          const previewReservations = dayReservations.slice(0, 2);
+          const totalCount = dayEvents.length + dayReservations.length;
+          const hiddenCount = totalCount - previewEvents.length - previewReservations.length;
+          const hasBookings = totalCount > 0;
+
           return (
-            <div key={key} className="min-h-[120px] p-3 bg-white rounded-lg shadow-sm border">
-              <div className="flex justify-between items-center mb-2">
-                <div className="text-sm font-semibold text-gray-800">{day.getDate()}</div>
-                <div className="text-xs text-gray-500">{day.toLocaleString(undefined, { month: 'short' })}</div>
-              </div>
+            <div key={key} className="group relative">
+              <div
+                tabIndex={0}
+                className="h-44 overflow-hidden rounded-lg border border-slate-200 bg-white p-3 shadow-sm outline-none transition focus-within:ring-2 focus-within:ring-blue-500 hover:shadow-md"
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="text-sm font-semibold text-gray-800">{day.getDate()}</div>
+                  <div className="text-xs text-gray-500">{day.toLocaleString(undefined, { month: 'short' })}</div>
+                </div>
 
-              <div className="space-y-2 text-xs">
-                {dayEvents.slice(0,3).map((ev: any) => (
-                  <div key={ev.id} className="px-2 py-1 bg-blue-50 text-blue-700 rounded">{ev.name}</div>
-                ))}
+                {hasBookings ? (
+                  <>
+                    <div className="mb-2 flex items-center justify-between text-[11px] text-slate-500">
+                      <span>{dayEvents.length} event{dayEvents.length === 1 ? "" : "s"}</span>
+                      <span>{dayReservations.length} reservation{dayReservations.length === 1 ? "" : "s"}</span>
+                    </div>
 
-                {dayReservations.slice(0,3).map((res: any) => (
-                  <div key={res.id} className="px-2 py-1 bg-gray-50 text-gray-800 rounded">
-                    <div className="font-medium">{res.item?.name || 'Item'}</div>
-                    <div className="text-[11px] text-gray-500">x{res.quantity} — {res.reservedBy || '—'}</div>
-                  </div>
-                ))}
+                    <div className="space-y-1.5 text-xs">
+                      {previewEvents.map((ev: any) => (
+                        <div key={ev.id} className="truncate rounded bg-blue-50 px-2 py-1 text-blue-700">
+                          {ev.name}
+                        </div>
+                      ))}
 
-                {dayEvents.length === 0 && dayReservations.length === 0 && (
+                      {previewReservations.map((res: any) => (
+                        <div key={res.id} className="truncate rounded bg-slate-50 px-2 py-1 text-slate-700">
+                          {(res.item?.name || "Item")} · x{res.quantity}
+                        </div>
+                      ))}
+
+                      {hiddenCount > 0 && (
+                        <div className="pt-1 text-[11px] font-medium text-slate-600">
+                          +{hiddenCount} more (hover for details)
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
                   <div className="text-xs text-gray-300">No bookings</div>
                 )}
               </div>
+
+              {hasBookings && (
+                <div className="pointer-events-none invisible absolute left-0 top-full z-20 mt-2 w-80 rounded-lg border border-slate-200 bg-white p-3 opacity-0 shadow-xl transition group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100">
+                  <div className="mb-2 text-sm font-semibold text-slate-900">
+                    {day.toLocaleDateString(undefined, {
+                      weekday: "long",
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </div>
+
+                  <div className="max-h-64 space-y-3 overflow-auto pr-1 text-xs">
+                    {dayEvents.length > 0 && (
+                      <div>
+                        <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-blue-600">Events</div>
+                        <div className="space-y-1">
+                          {dayEvents.map((ev: any) => (
+                            <div key={ev.id} className="rounded bg-blue-50 px-2 py-1 text-blue-700">
+                              {ev.name}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {dayReservations.length > 0 && (
+                      <div>
+                        <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-600">Reserved Items</div>
+                        <div className="space-y-1">
+                          {dayReservations.map((res: any) => (
+                            <div key={res.id} className="rounded bg-slate-50 px-2 py-1 text-slate-700">
+                              <div className="font-medium text-slate-800">{res.item?.name || "Item"}</div>
+                              <div className="text-[11px] text-slate-500">x{res.quantity} • {res.reservedBy || "Unknown"}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
