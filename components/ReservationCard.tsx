@@ -1,7 +1,7 @@
 "use client";
 
 import { markAsReturned } from "@/actions/inventory";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ReservationCardProps = {
   reservation: {
