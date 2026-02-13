@@ -29,7 +29,12 @@ type ReservationCardProps = {
   onToggleSelect?: (id: number, checked: boolean) => void;
 };
 
-export default function ReservationCard({ reservation }: ReservationCardProps) {
+export default function ReservationCard({
+  reservation,
+  selectable,
+  selected,
+  onToggleSelect,
+}: ReservationCardProps) {
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [conditionNotes, setConditionNotes] = useState("");
   const [returnedBy, setReturnedBy] = useState<string | undefined>(reservation.returnedBy || "");
