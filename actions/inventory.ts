@@ -18,7 +18,7 @@ export async function getItems() {
 export async function getItemById(id: number) {
   try {
     const result = await db.select().from(items).where(eq(items.id, id));
-    return result[0];
+    return result[0] || null;
   } catch (error) {
     console.error("Error fetching item:", error);
     throw error;
