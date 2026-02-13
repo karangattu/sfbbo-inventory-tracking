@@ -1,24 +1,37 @@
-import { getEvents, getReservations } from "@/actions/inventory";
+import { getEvents, getReservations, getItems } from "@/actions/inventory";
 
 function toDateKey(d: Date) {
   return d.toISOString().slice(0, 10);
 }
 
-export default async function CalendarPage() {
-  const events = await getEvents();
+export default async function CalendarPage({
+  searchParams,
+}: {
+  searchParams?: { year?: string; month?: string; eventId?: string; itemId?: string };
+}) {
+  const allEvents = await getEvents();
   const reservations = await getReservations();
+  const items = await getItems();
 
   const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth(); // 0-indexed
+  const qsYear = searchParams?.year ? parseInt(searchParams.year, 10) : now.getFullYear();
+  const qsMonth = searchParams?.month ? parseInt(searchParams.month, 10) - 1 : now.getMonth(); // month in query is 1-based
+  const filterEventId = searchParams?.eventId ? parseInt(searchParams.eventId, 10) : undefined;
+  const filterItemId = searchParams?.itemId ? parseInt(searchParams.itemId, 10) : undefined;
 
-  // build days for current month (start at 1..end)
+  const year = qsYear;
+  const month = qsMonth;
+
+  // build days for selected month
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const days: Date[] = [];
   for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
     days.push(new Date(d));
   }
+
+  // Filter events/reservations by selected filters
+  const events = filterEventId ? allEvents.filter((e) => e.id === filterEventId) : allEvents;
 
   const eventsByDate: Record<string, any[]> = {};
   events.forEach((ev) => {
@@ -29,24 +42,66 @@ export default async function CalendarPage() {
 
   const reservationsByDate: Record<string, any[]> = {};
   reservations.forEach((r) => {
-    if (r.event?.eventDate) {
-      const key = toDateKey(new Date(r.event.eventDate));
-      reservationsByDate[key] = reservationsByDate[key] || [];
-      reservationsByDate[key].push(r);
-    }
+    if (!r.event?.eventDate) return;
+    const evDate = new Date(r.event.eventDate);
+    if (evDate.getFullYear() !== year || evDate.getMonth() !== month) return; // only show reservations in selected month
+    if (filterEventId && r.event?.id !== filterEventId) return;
+    if (filterItemId && r.item?.id !== filterItemId) return;
+
+    const key = toDateKey(evDate);
+    reservationsByDate[key] = reservationsByDate[key] || [];
+    reservationsByDate[key].push(r);
   });
+
+  const prev = new Date(year, month - 1, 1);
+  const next = new Date(year, month + 1, 1);
+
+  const buildHref = (y: number, m0: number) => {
+    const params = new URLSearchParams();
+    params.set("year", String(y));
+    params.set("month", String(m0 + 1));
+    if (filterEventId) params.set("eventId", String(filterEventId));
+    if (filterItemId) params.set("itemId", String(filterItemId));
+    return `/calendar?${params.toString()}`;
+  };
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Calendar</h1>
+
+        <div className="flex items-center space-x-3">
+          <a href={buildHref(prev.getFullYear(), prev.getMonth())} className="px-3 py-2 bg-gray-100 rounded">◀ Prev</a>
+          <div className="text-sm font-medium">{firstDay.toLocaleString(undefined, { month: 'long', year: 'numeric' })}</div>
+          <a href={buildHref(next.getFullYear(), next.getMonth())} className="px-3 py-2 bg-gray-100 rounded">Next ▶</a>
+        </div>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <p className="text-sm text-gray-600">
-          This calendar shows events and which items are reserved for each event date.
-          Click through <a className="text-blue-600 underline" href="/events">Events</a> or <a className="text-blue-600 underline" href="/reservations">Reservations</a> for details.
+          Shows events and reserved items for the selected month. Click an event/reservation for details.
         </p>
+
+        <form method="get" className="flex items-center space-x-3">
+          <input type="hidden" name="year" value={String(year)} />
+          <input type="hidden" name="month" value={String(month + 1)} />
+
+          <select name="eventId" defaultValue={filterEventId ?? ""} className="px-2 py-2 border rounded bg-white text-sm">
+            <option value="">All events</option>
+            {allEvents.map((ev) => (
+              <option key={ev.id} value={ev.id}>{ev.name}</option>
+            ))}
+          </select>
+
+          <select name="itemId" defaultValue={filterItemId ?? ""} className="px-2 py-2 border rounded bg-white text-sm">
+            <option value="">All items</option>
+            {items.map((it) => (
+              <option key={it.id} value={it.id}>{it.name}</option>
+            ))}
+          </select>
+
+          <button type="submit" className="px-3 py-2 bg-blue-600 text-white rounded text-sm">Filter</button>
+        </form>
       </div>
 
       <div className="grid grid-cols-7 gap-4">

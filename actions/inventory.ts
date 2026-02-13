@@ -331,3 +331,19 @@ export async function markReservationsAsReturned(
     throw error;
   }
 }
+
+// Return a deduplicated list of people who reserved/returned items (for autocomplete)
+export async function getPeople() {
+  try {
+    const rows = await db.select({ reservedBy: reservations.reservedBy, returnedBy: reservations.returnedBy }).from(reservations);
+    const set = new Set<string>();
+    for (const r of rows) {
+      if (r.reservedBy) set.add(r.reservedBy);
+      if (r.returnedBy) set.add(r.returnedBy);
+    }
+    return Array.from(set).sort();
+  } catch (error) {
+    console.error("Error fetching people:", error);
+    return [];
+  }
+}

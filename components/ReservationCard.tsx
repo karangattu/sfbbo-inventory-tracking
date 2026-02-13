@@ -33,7 +33,20 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [conditionNotes, setConditionNotes] = useState("");
   const [returnedBy, setReturnedBy] = useState<string | undefined>(reservation.returnedBy || "");
+  const [people, setPeople] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // fetch people for autocomplete
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/people');
+        if (res.ok) setPeople(await res.json());
+      } catch (e) {
+        /* ignore */
+      }
+    })();
+  }, []);
 
   async function handleReturn() {
     setIsSubmitting(true);
@@ -142,7 +155,12 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
 
           <div>
             <label htmlFor={`returnedBy-${reservation.id}`} className="block text-sm font-medium text-gray-700 mb-1">Returned by</label>
-            <input id={`returnedBy-${reservation.id}`} value={returnedBy} onChange={(e) => setReturnedBy(e.target.value)} placeholder="Full name" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input list="people-list" id={`returnedBy-${reservation.id}`} value={returnedBy} onChange={(e) => setReturnedBy(e.target.value)} placeholder="Full name" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <datalist id="people-list">
+              {people.map((p) => (
+                <option key={p} value={p} />
+              ))}
+            </datalist>
           </div>
           <div className="flex space-x-2">
             <button

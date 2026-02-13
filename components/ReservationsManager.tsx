@@ -15,7 +15,19 @@ export default function ReservationsManager({ initialReservations }: Props) {
   const [showBulkReturnForm, setShowBulkReturnForm] = useState(false);
   const [returnedBy, setReturnedBy] = useState("");
   const [conditionNotes, setConditionNotes] = useState("");
+  const [people, setPeople] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/people');
+        if (res.ok) setPeople(await res.json());
+      } catch (e) {
+        /* ignore */
+      }
+    })();
+  }, []);
 
   function toggle(id: number, checked: boolean) {
     setSelected((s) => ({ ...s, [id]: checked }));
@@ -82,7 +94,12 @@ export default function ReservationsManager({ initialReservations }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">Returned by *</label>
-              <input value={returnedBy} onChange={(e) => setReturnedBy(e.target.value)} required placeholder="Full name" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input list="people-list" value={returnedBy} onChange={(e) => setReturnedBy(e.target.value)} required placeholder="Full name" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <datalist id="people-list">
+                {people.map((p) => (
+                  <option key={p} value={p} />
+                ))}
+              </datalist>
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Condition notes (optional)</label>

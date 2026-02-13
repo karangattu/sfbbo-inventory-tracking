@@ -7,6 +7,7 @@ export default function CreateReservationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [items, setItems] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
+  const [people, setPeople] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadData() {
@@ -20,6 +21,14 @@ export default function CreateReservationForm() {
         (event) => new Date(event.eventDate) >= new Date()
       );
       setEvents(futureEvents);
+
+      // fetch people for autocomplete
+      try {
+        const res = await fetch('/api/people');
+        if (res.ok) setPeople(await res.json());
+      } catch (e) {
+        /* ignore */
+      }
     }
     loadData();
   }, []);
@@ -71,7 +80,12 @@ export default function CreateReservationForm() {
 
         <div>
           <label htmlFor="reservedBy" className="block text-sm font-medium text-gray-700 mb-1">Who is reserving?</label>
-          <input id="reservedBy" name="reservedBy" required placeholder="Full name" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input list="people-list" id="reservedBy" name="reservedBy" required placeholder="Full name" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <datalist id="people-list">
+            {people.map((p) => (
+              <option key={p} value={p} />
+            ))}
+          </datalist>
         </div>
       </div>
 
