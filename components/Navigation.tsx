@@ -9,40 +9,42 @@ export default function Navigation() {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link href="/" className="text-xl font-bold text-blue-600">
-            SFBBO Inventory
+    <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 md:px-6">
+        <div>
+          <Link href="/" className="text-xl font-bold text-slate-900">
+            SFBBO Inventory Tracker
           </Link>
-          
-          <div className="flex space-x-4">
+          <p className="text-xs text-slate-500">Inventory, reservations, events, and booking calendar</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/inventory"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 isActive("/inventory")
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-700 hover:bg-slate-100"
               }`}
             >
               Inventory
             </Link>
             <Link
               href="/reservations"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 isActive("/reservations")
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-700 hover:bg-slate-100"
               }`}
             >
               Reservations
             </Link>
             <Link
               href="/events"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 isActive("/events")
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-700 hover:bg-slate-100"
               }`}
             >
               Events
@@ -50,15 +52,14 @@ export default function Navigation() {
 
             <Link
               href="/calendar"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 isActive("/calendar")
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-700 hover:bg-slate-100"
               }`}
             >
               Calendar
             </Link>
-          </div>
         </div>
       </div>
     </nav>

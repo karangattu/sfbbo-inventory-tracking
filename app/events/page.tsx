@@ -12,17 +12,20 @@ export default async function EventsPage() {
   );
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Upcoming Events</h1>
+    <div className="space-y-8">
+      <div>
+        <h1 className="page-title">Events</h1>
+        <p className="page-subtitle">Plan upcoming activities and align reservations ahead of event day.</p>
+      </div>
 
-      <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Event</h2>
+      <div className="surface-card p-6">
+        <h2 className="section-title mb-4">Add New Event</h2>
         <AddEventForm />
       </div>
 
       {upcomingEvents.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow-md">
-          <p className="text-gray-500 text-lg">
+        <div className="surface-card text-center py-12">
+          <p className="text-slate-500 text-lg">
             No upcoming events. Add your first event above!
           </p>
         </div>

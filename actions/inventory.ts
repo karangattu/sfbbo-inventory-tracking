@@ -211,19 +211,41 @@ export async function createReservation(formData: FormData) {
 
   // If multiple itemIds provided -> bulk insert
   if (itemIds && itemIds.length > 0) {
-    const parsed = itemIds.map((i) => parseInt(i));
+    const parsed = Array.from(
+      new Set(
+        itemIds
+          .map((value) => Number.parseInt(value, 10))
+          .filter((value) => Number.isInteger(value) && value > 0)
+      )
+    );
+
+    if (parsed.length === 0) {
+      throw new Error("Select at least one valid item");
+    }
 
     // Validate quantities and availability for each
     for (const id of parsed) {
       const qtyStr = formData.get(`quantity-${id}`) as string | null;
-      const quantity = qtyStr ? parseInt(qtyStr) : 1;
-      if (!quantity || quantity <= 0) {
+      const quantity = qtyStr ? Number.parseInt(qtyStr, 10) : 1;
+      if (!Number.isInteger(quantity) || quantity <= 0) {
         throw new Error("Quantity must be at least 1 for each selected item");
       }
+
+      const item = await getItemById(id);
+      if (!item) {
+        throw new Error(`Item ${id} does not exist`);
+      }
+
+      if (quantity > item.quantity) {
+        throw new Error(
+          `Cannot reserve ${quantity} of ${item.name}. Max inventory is ${item.quantity}.`
+        );
+      }
+
       const available = await getAvailableQuantity(id, eventId);
       if (available < quantity) {
         throw new Error(
-          `Only ${available} items available for item ${id}. Cannot reserve ${quantity}.`
+          `Only ${available} of ${item.name} available. Cannot reserve ${quantity}.`
         );
       }
     }
@@ -231,7 +253,7 @@ export async function createReservation(formData: FormData) {
     try {
       for (const id of parsed) {
         const qtyStr = formData.get(`quantity-${id}`) as string | null;
-        const quantity = qtyStr ? parseInt(qtyStr) : 1;
+        const quantity = qtyStr ? Number.parseInt(qtyStr, 10) : 1;
         await db.insert(reservations).values({
           itemId: id,
           eventId,
@@ -250,11 +272,22 @@ export async function createReservation(formData: FormData) {
   }
 
   // Backward-compatible single-reservation handling
-  const itemId = parseInt(formData.get("itemId") as string);
-  const quantity = parseInt(formData.get("quantity") as string);
+  const itemId = Number.parseInt(formData.get("itemId") as string, 10);
+  const quantity = Number.parseInt(formData.get("quantity") as string, 10);
 
-  if (!itemId || !quantity) {
+  if (!Number.isInteger(itemId) || !Number.isInteger(quantity) || quantity <= 0) {
     throw new Error("Item and quantity are required");
+  }
+
+  const item = await getItemById(itemId);
+  if (!item) {
+    throw new Error("Selected item does not exist");
+  }
+
+  if (quantity > item.quantity) {
+    throw new Error(
+      `Cannot reserve ${quantity} of ${item.name}. Max inventory is ${item.quantity}.`
+    );
   }
 
   const available = await getAvailableQuantity(itemId, eventId);

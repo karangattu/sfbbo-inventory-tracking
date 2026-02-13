@@ -2,52 +2,49 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-4xl font-bold text-gray-900 mb-6">
-        Welcome to SFBBO Inventory Tracker
-      </h1>
-      
-      <p className="text-lg text-gray-700 mb-8">
-        Manage your inventory items, track reservations, and plan for upcoming events.
-      </p>
+    <div className="space-y-8">
+      <section className="surface-card p-8">
+        <h1 className="page-title">Welcome to SFBBO Inventory Tracker</h1>
+        <p className="page-subtitle">
+          Reserve items for events, return items in bulk, and monitor availability in one place.
+        </p>
+      </section>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Link
           href="/inventory"
-          className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+          className="surface-card block p-6 hover:shadow-md transition-shadow"
         >
-          <h2 className="text-2xl font-semibold text-blue-600 mb-2">
-            Inventory Dashboard
-          </h2>
-          <p className="text-gray-600">
-            View all items with real-time availability and manage your inventory
-          </p>
+          <h2 className="section-title mb-2">Inventory</h2>
+          <p className="text-sm text-slate-600">Add and organize items, storage locations, and available counts.</p>
         </Link>
 
         <Link
           href="/reservations"
-          className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+          className="surface-card block p-6 hover:shadow-md transition-shadow"
         >
-          <h2 className="text-2xl font-semibold text-green-600 mb-2">
-            Reservations
-          </h2>
-          <p className="text-gray-600">
-            Reserve items, track status, and mark items as returned
-          </p>
+          <h2 className="section-title mb-2">Reservations</h2>
+          <p className="text-sm text-slate-600">Reserve multiple items per event and return selected items in one click.</p>
         </Link>
 
         <Link
-          href="/events"
-          className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+          href="/calendar"
+          className="surface-card block p-6 hover:shadow-md transition-shadow"
         >
-          <h2 className="text-2xl font-semibold text-purple-600 mb-2">
-            Upcoming Events
-          </h2>
-          <p className="text-gray-600">
-            Manage events and plan inventory needs
-          </p>
+          <h2 className="section-title mb-2">Calendar</h2>
+          <p className="text-sm text-slate-600">View monthly event bookings with item-level reservation details.</p>
         </Link>
       </div>
+
+      <section className="surface-card p-6">
+        <h2 className="section-title">Quick Start</h2>
+        <ol className="mt-3 list-decimal pl-5 space-y-2 text-sm text-slate-600">
+          <li>Add items to inventory with total quantities.</li>
+          <li>Create or import upcoming events.</li>
+          <li>Reserve one or more items for an event with per-item quantity.</li>
+          <li>Use bulk return to close all checked reservations at once.</li>
+        </ol>
+      </section>
     </div>
   );
 }
