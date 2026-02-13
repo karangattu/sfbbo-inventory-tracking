@@ -38,6 +38,8 @@ export const reservations = sqliteTable("reservations", {
   quantity: integer("quantity").notNull().default(1),
   status: text("status").notNull().default("reserved"), // reserved, returned
   conditionNotes: text("condition_notes"),
+  reservedBy: text("reserved_by"),
+  returnedBy: text("returned_by"),
   reservedAt: integer("reserved_at", { mode: "timestamp" })
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),

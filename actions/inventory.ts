@@ -145,6 +145,8 @@ export async function getReservations() {
         quantity: reservations.quantity,
         status: reservations.status,
         conditionNotes: reservations.conditionNotes,
+        reservedBy: reservations.reservedBy,
+        returnedBy: reservations.returnedBy,
         reservedAt: reservations.reservedAt,
         returnedAt: reservations.returnedAt,
         item: {
@@ -201,9 +203,10 @@ export async function createReservation(formData: FormData) {
   const itemId = parseInt(formData.get("itemId") as string);
   const eventId = parseInt(formData.get("eventId") as string);
   const quantity = parseInt(formData.get("quantity") as string);
+  const reservedBy = (formData.get("reservedBy") as string) || null;
 
-  if (!itemId || !eventId || !quantity) {
-    throw new Error("Item, event, and quantity are required");
+  if (!itemId || !eventId || !quantity || !reservedBy) {
+    throw new Error("Item, event, quantity and reserver name are required");
   }
 
   // Check availability
@@ -220,6 +223,7 @@ export async function createReservation(formData: FormData) {
       eventId,
       quantity,
       status: "reserved",
+      reservedBy,
     });
     revalidatePath("/reservations");
     revalidatePath("/inventory");
@@ -231,7 +235,8 @@ export async function createReservation(formData: FormData) {
 
 export async function markAsReturned(
   reservationId: number,
-  conditionNotes: string
+  conditionNotes: string,
+  returnedBy?: string
 ) {
   try {
     await db
@@ -239,6 +244,7 @@ export async function markAsReturned(
       .set({
         status: "returned",
         conditionNotes,
+        returnedBy: returnedBy || null,
         returnedAt: new Date(),
       })
       .where(eq(reservations.id, reservationId));

@@ -9,6 +9,8 @@ type ReservationCardProps = {
     quantity: number;
     status: string;
     conditionNotes: string | null;
+    reservedBy?: string | null;
+    returnedBy?: string | null;
     reservedAt: Date;
     returnedAt: Date | null;
     item: {
@@ -32,7 +34,7 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
   async function handleReturn() {
     setIsSubmitting(true);
     try {
-      await markAsReturned(reservation.id, conditionNotes);
+      await markAsReturned(reservation.id, conditionNotes, returnedBy);
       setShowReturnForm(false);
     } catch (error) {
       alert(error instanceof Error ? error.message : "Failed to mark as returned");
@@ -76,11 +78,21 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
           <span className="text-gray-600">Reserved:</span>
           <span className="font-medium text-gray-900">{reservedDate}</span>
         </div>
+        <div className="flex justify-between">
+          <span className="text-gray-600">Reserved by:</span>
+          <span className="font-medium text-gray-900">{reservation.reservedBy || "—"}</span>
+        </div>
         {reservation.status === "returned" && returnedDate && (
-          <div className="flex justify-between">
-            <span className="text-gray-600">Returned:</span>
-            <span className="font-medium text-gray-900">{returnedDate}</span>
-          </div>
+          <>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Returned:</span>
+              <span className="font-medium text-gray-900">{returnedDate}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Returned by:</span>
+              <span className="font-medium text-gray-900">{reservation.returnedBy || "—"}</span>
+            </div>
+          </>
         )}
       </div>
 
@@ -110,6 +122,11 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
               placeholder="Note any damage or issues..."
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+
+          <div>
+            <label htmlFor={`returnedBy-${reservation.id}`} className="block text-sm font-medium text-gray-700 mb-1">Returned by</label>
+            <input id={`returnedBy-${reservation.id}`} value={returnedBy} onChange={(e) => setReturnedBy(e.target.value)} placeholder="Full name" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div className="flex space-x-2">
             <button
