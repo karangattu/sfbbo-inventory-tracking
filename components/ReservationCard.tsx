@@ -24,11 +24,15 @@ type ReservationCardProps = {
       eventDate: Date;
     } | null;
   };
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: number, checked: boolean) => void;
 };
 
 export default function ReservationCard({ reservation }: ReservationCardProps) {
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [conditionNotes, setConditionNotes] = useState("");
+  const [returnedBy, setReturnedBy] = useState<string | undefined>(reservation.returnedBy || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleReturn() {
@@ -50,11 +54,23 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
-      <div className="mb-3">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {reservation.item?.name || "Unknown Item"}
-        </h3>
-        <p className="text-sm text-gray-600">{reservation.item?.category}</p>
+      <div className="mb-3 flex items-start justify-between">
+        <div className="flex items-start space-x-3">
+          {selectable && (
+            <input
+              type="checkbox"
+              checked={!!selected}
+              onChange={(e) => onToggleSelect?.(reservation.id, e.target.checked)}
+              className="mt-1 h-4 w-4"
+            />
+          )}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {reservation.item?.name || "Unknown Item"}
+            </h3>
+            <p className="text-sm text-gray-600">{reservation.item?.category}</p>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-2 text-sm mb-4">

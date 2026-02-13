@@ -1,6 +1,7 @@
 import { getReservations } from "@/actions/inventory";
 import CreateReservationForm from "@/components/CreateReservationForm";
 import ReservationCard from "@/components/ReservationCard";
+import ReservationsManager from "@/components/ReservationsManager";
 
 export default async function ReservationsPage() {
   const reservations = await getReservations();
@@ -27,11 +28,7 @@ export default async function ReservationsPage() {
               <p className="text-gray-500">No active reservations</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {activeReservations.map((reservation) => (
-                <ReservationCard key={reservation.id} reservation={reservation} />
-              ))}
-            </div>
+            <ReservationsManager initialReservations={activeReservations} />
           )}
         </div>
 

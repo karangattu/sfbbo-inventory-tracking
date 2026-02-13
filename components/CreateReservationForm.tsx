@@ -50,22 +50,31 @@ export default function CreateReservationForm() {
   return (
     <form id="create-reservation-form" action={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="itemId" className="block text-sm font-medium text-gray-700 mb-1">
-            Item *
-          </label>
-          <select
-            id="itemId"
-            name="itemId"
-            required
-            onChange={(e) => setSelectedItem(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select an item</option>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Items (select one or more)</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-auto border border-gray-100 rounded-md p-3">
             {items.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name} ({item.category})
-              </option>
+              <label key={item.id} className="flex items-center justify-between p-2 rounded hover:bg-gray-50">
+                <div className="flex items-center space-x-3">
+                  <input type="checkbox" name="itemIds" value={item.id} className="h-4 w-4" />
+                  <div>
+                    <div className="font-medium text-gray-900">{item.name}</div>
+                    <div className="text-xs text-gray-500">{item.category}</div>
+                  </div>
+                </div>
+                <input name={`quantity-${item.id}`} type="number" defaultValue={1} min={1} className="w-20 px-2 py-1 border border-gray-200 rounded text-sm text-gray-900" />
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-gray-500 mt-2">Tip: select multiple items and set quantities for each.</p>
+        </div>
+
+        <div>
+          <label htmlFor="eventId" className="block text-sm font-medium text-gray-700 mb-1">Event *</label>
+          <select id="eventId" name="eventId" required className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Select an event</option>
+            {events.map((event) => (
+              <option key={event.id} value={event.id}>{event.name} ({new Date(event.eventDate).toLocaleDateString()})</option>
             ))}
           </select>
         </div>
@@ -74,53 +83,9 @@ export default function CreateReservationForm() {
           <label htmlFor="reservedBy" className="block text-sm font-medium text-gray-700 mb-1">Who is reserving?</label>
           <input id="reservedBy" name="reservedBy" required placeholder="Full name" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
-
-        <div>
-          <label htmlFor="eventId" className="block text-sm font-medium text-gray-700 mb-1">
-            Event *
-          </label>
-          <select
-            id="eventId"
-            name="eventId"
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select an event</option>
-            {events.map((event) => (
-              <option key={event.id} value={event.id}>
-                {event.name} ({new Date(event.eventDate).toLocaleDateString()})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
-            Quantity *
-          </label>
-          <input
-            type="number"
-            id="quantity"
-            name="quantity"
-            required
-            min="1"
-            max={available}
-            defaultValue="1"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {selectedItem && (
-            <p className="text-sm text-gray-600 mt-1">
-              Available: {available}
-            </p>
-          )}
-        </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting || !selectedItem || available === 0}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-      >
+      <button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
         {isSubmitting ? "Creating..." : "Create Reservation"}
       </button>
     </form>

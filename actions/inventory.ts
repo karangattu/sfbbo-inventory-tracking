@@ -200,16 +200,63 @@ export async function getAvailableQuantity(itemId: number, eventId?: number) {
 }
 
 export async function createReservation(formData: FormData) {
-  const itemId = parseInt(formData.get("itemId") as string);
+  // Support bulk reservation: form can submit multiple itemIds (checkboxes)
+  const itemIds = formData.getAll("itemIds") as string[];
   const eventId = parseInt(formData.get("eventId") as string);
-  const quantity = parseInt(formData.get("quantity") as string);
   const reservedBy = (formData.get("reservedBy") as string) || null;
 
-  if (!itemId || !eventId || !quantity || !reservedBy) {
-    throw new Error("Item, event, quantity and reserver name are required");
+  if (!eventId || !reservedBy) {
+    throw new Error("Event and reserver name are required");
   }
 
-  // Check availability
+  // If multiple itemIds provided -> bulk insert
+  if (itemIds && itemIds.length > 0) {
+    const parsed = itemIds.map((i) => parseInt(i));
+
+    // Validate quantities and availability for each
+    for (const id of parsed) {
+      const qtyStr = formData.get(`quantity-${id}`) as string | null;
+      const quantity = qtyStr ? parseInt(qtyStr) : 1;
+      if (!quantity || quantity <= 0) {
+        throw new Error("Quantity must be at least 1 for each selected item");
+      }
+      const available = await getAvailableQuantity(id, eventId);
+      if (available < quantity) {
+        throw new Error(
+          `Only ${available} items available for item ${id}. Cannot reserve ${quantity}.`
+        );
+      }
+    }
+
+    try {
+      for (const id of parsed) {
+        const qtyStr = formData.get(`quantity-${id}`) as string | null;
+        const quantity = qtyStr ? parseInt(qtyStr) : 1;
+        await db.insert(reservations).values({
+          itemId: id,
+          eventId,
+          quantity,
+          status: "reserved",
+          reservedBy,
+        });
+      }
+      revalidatePath("/reservations");
+      revalidatePath("/inventory");
+      return;
+    } catch (error) {
+      console.error("Error creating reservations:", error);
+      throw error;
+    }
+  }
+
+  // Backward-compatible single-reservation handling
+  const itemId = parseInt(formData.get("itemId") as string);
+  const quantity = parseInt(formData.get("quantity") as string);
+
+  if (!itemId || !quantity) {
+    throw new Error("Item and quantity are required");
+  }
+
   const available = await getAvailableQuantity(itemId, eventId);
   if (available < quantity) {
     throw new Error(
@@ -252,6 +299,35 @@ export async function markAsReturned(
     revalidatePath("/inventory");
   } catch (error) {
     console.error("Error marking as returned:", error);
+    throw error;
+  }
+}
+
+export async function markReservationsAsReturned(
+  reservationIds: number[],
+  conditionNotes?: string,
+  returnedBy?: string
+) {
+  if (!reservationIds || reservationIds.length === 0) {
+    throw new Error("No reservations selected");
+  }
+
+  try {
+    for (const id of reservationIds) {
+      await db
+        .update(reservations)
+        .set({
+          status: "returned",
+          conditionNotes: conditionNotes || null,
+          returnedBy: returnedBy || null,
+          returnedAt: new Date(),
+        })
+        .where(eq(reservations.id, id));
+    }
+    revalidatePath("/reservations");
+    revalidatePath("/inventory");
+  } catch (error) {
+    console.error("Error marking reservations as returned:", error);
     throw error;
   }
 }
