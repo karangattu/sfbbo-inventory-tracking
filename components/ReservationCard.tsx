@@ -58,11 +58,11 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
       <div className="space-y-2 text-sm mb-4">
         <div className="flex justify-between">
           <span className="text-gray-600">Event:</span>
-          <span className="font-medium">{reservation.event?.name || "Unknown Event"}</span>
+          <span className="font-medium text-gray-900">{reservation.event?.name || "Unknown Event"}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Event Date:</span>
-          <span className="font-medium">
+          <span className="font-medium text-gray-900">
             {reservation.event?.eventDate
               ? new Date(reservation.event.eventDate).toLocaleDateString()
               : "N/A"}
@@ -70,16 +70,16 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Quantity:</span>
-          <span className="font-medium">{reservation.quantity}</span>
+          <span className="font-medium text-gray-900">{reservation.quantity}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Reserved:</span>
-          <span className="font-medium">{reservedDate}</span>
+          <span className="font-medium text-gray-900">{reservedDate}</span>
         </div>
         {reservation.status === "returned" && returnedDate && (
           <div className="flex justify-between">
             <span className="text-gray-600">Returned:</span>
-            <span className="font-medium">{returnedDate}</span>
+            <span className="font-medium text-gray-900">{returnedDate}</span>
           </div>
         )}
       </div>

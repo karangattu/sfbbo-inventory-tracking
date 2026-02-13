@@ -71,7 +71,7 @@ export default function ItemCard({ item }: ItemCardProps) {
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
           <span className="text-gray-600">Total Quantity:</span>
-          <span className="font-medium">{item.quantity}</span>
+          <span className="font-medium text-gray-900">{item.quantity}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Available:</span>
@@ -82,7 +82,7 @@ export default function ItemCard({ item }: ItemCardProps) {
         {item.storageLocation && (
           <div className="flex justify-between">
             <span className="text-gray-600">Location:</span>
-            <span className="font-medium">{item.storageLocation}</span>
+            <span className="font-medium text-gray-900">{item.storageLocation}</span>
           </div>
         )}
       </div>
