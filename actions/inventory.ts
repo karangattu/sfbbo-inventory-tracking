@@ -126,6 +126,45 @@ export async function addEvent(formData: FormData) {
   }
 }
 
+export async function updateEvent(id: number, formData: FormData) {
+  const name = formData.get("name") as string;
+  const description = formData.get("description") as string;
+  const eventDateRaw = formData.get("eventDate") as string;
+  const location = formData.get("location") as string;
+
+  if (!name || !eventDateRaw) {
+    throw new Error("Name and event date are required");
+  }
+
+  const eventDate = new Date(eventDateRaw);
+  if (Number.isNaN(eventDate.getTime())) {
+    throw new Error("Invalid event date");
+  }
+
+  if (eventDate < new Date()) {
+    throw new Error("Event date must be in the future");
+  }
+
+  try {
+    await db
+      .update(events)
+      .set({
+        name,
+        description,
+        eventDate,
+        location,
+      })
+      .where(eq(events.id, id));
+
+    revalidatePath("/events");
+    revalidatePath("/calendar");
+    revalidatePath("/reservations");
+  } catch (error) {
+    console.error("Error updating event:", error);
+    throw error;
+  }
+}
+
 export async function deleteEvent(id: number) {
   try {
     await db.delete(events).where(eq(events.id, id));
