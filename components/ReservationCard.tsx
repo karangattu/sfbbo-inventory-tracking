@@ -1,7 +1,7 @@
 "use client";
 
 import { markAsReturned } from "@/actions/inventory";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type ReservationCardProps = {
   reservation: {
@@ -27,6 +27,7 @@ type ReservationCardProps = {
   selectable?: boolean;
   selected?: boolean;
   onToggleSelect?: (id: number, checked: boolean) => void;
+  people?: string[];
 };
 
 export default function ReservationCard({
@@ -34,24 +35,12 @@ export default function ReservationCard({
   selectable,
   selected,
   onToggleSelect,
+  people = [],
 }: ReservationCardProps) {
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [conditionNotes, setConditionNotes] = useState("");
   const [returnedBy, setReturnedBy] = useState<string | undefined>(reservation.returnedBy || "");
-  const [people, setPeople] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // fetch people for autocomplete
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch('/api/people');
-        if (res.ok) setPeople(await res.json());
-      } catch (e) {
-        /* ignore */
-      }
-    })();
-  }, []);
 
   async function handleReturn() {
     setIsSubmitting(true);

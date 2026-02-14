@@ -1,40 +1,14 @@
 "use client";
 
-import { addItem, getItems } from "@/actions/inventory";
-import { useEffect, useState } from "react";
+import { addItem } from "@/actions/inventory";
+import { useState } from "react";
 
-export default function AddItemForm() {
+type AddItemFormProps = {
+  categoryOptions?: string[];
+};
+
+export default function AddItemForm({ categoryOptions = [] }: AddItemFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
-
-  useEffect(() => {
-    let isActive = true;
-
-    async function loadCategories() {
-      try {
-        const existingItems = await getItems();
-        const categories = Array.from(
-          new Set(
-            existingItems
-              .map((item) => item.category?.trim())
-              .filter((category): category is string => Boolean(category))
-          )
-        ).sort((first, second) => first.localeCompare(second));
-
-        if (isActive) {
-          setCategoryOptions(categories);
-        }
-      } catch {
-        // keep form usable even if suggestions fail to load
-      }
-    }
-
-    loadCategories();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);

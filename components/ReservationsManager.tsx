@@ -124,6 +124,7 @@ export default function ReservationsManager({ initialReservations }: Props) {
             selectable
             selected={!!selected[reservation.id]}
             onToggleSelect={toggle}
+            people={people}
           />
         ))}
       </div>

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #f3f5f9;
+  --background: #f8fafc;
   --foreground: #0f172a;
 }
 
@@ -15,7 +15,7 @@ body {
 
 @layer components {
   .app-shell {
-    @apply min-h-screen bg-slate-100;
+    @apply min-h-screen bg-slate-50;
   }
 
   .surface-card {
@@ -23,20 +23,35 @@ body {
   }
 
   .page-title {
-    @apply text-3xl font-bold tracking-tight text-slate-900;
+    @apply text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl;
   }
 
   .page-subtitle {
-    @apply mt-1 text-sm text-slate-600;
+    @apply mt-1 text-sm text-slate-500;
   }
 
   .section-title {
-    @apply text-xl font-semibold text-slate-900;
+    @apply text-lg font-semibold text-slate-900 sm:text-xl;
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .animate-in {
+    animation: slide-in 0.2s ease-out;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

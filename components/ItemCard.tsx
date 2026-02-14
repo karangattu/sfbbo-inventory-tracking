@@ -1,7 +1,7 @@
 "use client";
 
-import { deleteItem, getItems, updateItem } from "@/actions/inventory";
-import { useEffect, useState } from "react";
+import { deleteItem, updateItem } from "@/actions/inventory";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type ItemCardProps = {
@@ -22,14 +22,14 @@ type ItemCardProps = {
       eventDate: Date | null;
     }>;
   };
+  categoryOptions?: string[];
 };
 
-export default function ItemCard({ item }: ItemCardProps) {
+export default function ItemCard({ item, categoryOptions = [] }: ItemCardProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
   const [formValues, setFormValues] = useState({
     name: item.name,
     description: item.description ?? "",
@@ -37,35 +37,6 @@ export default function ItemCard({ item }: ItemCardProps) {
     quantity: String(item.quantity),
     storageLocation: item.storageLocation ?? "",
   });
-
-  useEffect(() => {
-    let isActive = true;
-
-    async function loadCategories() {
-      try {
-        const existingItems = await getItems();
-        const categories = Array.from(
-          new Set(
-            existingItems
-              .map((existingItem) => existingItem.category?.trim())
-              .filter((category): category is string => Boolean(category))
-          )
-        ).sort((first, second) => first.localeCompare(second));
-
-        if (isActive) {
-          setCategoryOptions(categories);
-        }
-      } catch {
-        // keep form usable even if suggestions fail to load
-      }
-    }
-
-    loadCategories();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   async function handleDelete() {
     if (!confirm(`Are you sure you want to delete "${item.name}"?`)) {

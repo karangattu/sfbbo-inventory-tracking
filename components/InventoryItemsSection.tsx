@@ -28,6 +28,18 @@ type InventoryItemsSectionProps = {
 export default function InventoryItemsSection({ items }: InventoryItemsSectionProps) {
   const [showReservedOnly, setShowReservedOnly] = useState(false);
 
+  const categoryOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          items
+            .map((item) => item.category?.trim())
+            .filter((c): c is string => Boolean(c))
+        )
+      ).sort(),
+    [items]
+  );
+
   const filteredItems = useMemo(() => {
     if (!showReservedOnly) return items;
     return items.filter((item) => item.activeReservations.length > 0);
@@ -96,7 +108,7 @@ export default function InventoryItemsSection({ items }: InventoryItemsSectionPr
               <h2 className="section-title mb-4 capitalize">{category}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categoryItems.map((item) => (
-                  <ItemCard key={item.id} item={item} />
+                  <ItemCard key={item.id} item={item} categoryOptions={categoryOptions} />
                 ))}
               </div>
             </div>

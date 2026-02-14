@@ -1,10 +1,13 @@
-import { getReservations } from "@/actions/inventory";
+import { getReservations, getPeople } from "@/actions/inventory";
 import CreateReservationForm from "@/components/CreateReservationForm";
 import ReservationCard from "@/components/ReservationCard";
 import ReservationsManager from "@/components/ReservationsManager";
 
 export default async function ReservationsPage() {
-  const reservations = await getReservations();
+  const [reservations, people] = await Promise.all([
+    getReservations(),
+    getPeople(),
+  ]);
 
   const activeReservations = reservations.filter((r) => r.status === "reserved");
   const returnedReservations = reservations.filter((r) => r.status === "returned");
@@ -46,7 +49,7 @@ export default async function ReservationsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {returnedReservations.map((reservation) => (
-                <ReservationCard key={reservation.id} reservation={reservation} />
+                <ReservationCard key={reservation.id} reservation={reservation} people={people} />
               ))}
             </div>
           )}
