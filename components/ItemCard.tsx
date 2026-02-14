@@ -3,6 +3,7 @@
 import { deleteItem, updateItem } from "@/actions/inventory";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatPacificDate } from "@/lib/time";
 
 type ItemCardProps = {
   item: {
@@ -270,7 +271,7 @@ export default function ItemCard({ item, categoryOptions = [] }: ItemCardProps) 
                 </p>
                 {reservation.eventDate && (
                   <p className="text-[11px] text-slate-500">
-                    Event date: {new Date(reservation.eventDate).toLocaleDateString()}
+                    Event date: {formatPacificDate(reservation.eventDate)}
                   </p>
                 )}
               </div>

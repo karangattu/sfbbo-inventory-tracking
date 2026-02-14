@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { items, events, reservations } from "@/db/schema";
 import { eq, sql, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { parsePacificDateTimeLocal } from "@/lib/time";
 
 // Item actions
 export async function getItems() {
@@ -100,11 +101,16 @@ export async function getEvents() {
 export async function addEvent(formData: FormData) {
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
-  const eventDate = new Date(formData.get("eventDate") as string);
+  const eventDateRaw = formData.get("eventDate") as string;
+  const eventDate = parsePacificDateTimeLocal(eventDateRaw);
   const location = formData.get("location") as string;
 
-  if (!name || !eventDate) {
+  if (!name || !eventDateRaw) {
     throw new Error("Name and event date are required");
+  }
+
+  if (Number.isNaN(eventDate.getTime())) {
+    throw new Error("Invalid event date");
   }
 
   // Validate that event date is in the future
@@ -136,7 +142,7 @@ export async function updateEvent(id: number, formData: FormData) {
     throw new Error("Name and event date are required");
   }
 
-  const eventDate = new Date(eventDateRaw);
+  const eventDate = parsePacificDateTimeLocal(eventDateRaw);
   if (Number.isNaN(eventDate.getTime())) {
     throw new Error("Invalid event date");
   }

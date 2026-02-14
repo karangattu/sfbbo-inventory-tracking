@@ -2,6 +2,7 @@
 
 import { markAsReturned } from "@/actions/inventory";
 import { useState } from "react";
+import { formatPacificDate } from "@/lib/time";
 
 type ReservationCardProps = {
   reservation: {
@@ -54,9 +55,9 @@ export default function ReservationCard({
     }
   }
 
-  const reservedDate = new Date(reservation.reservedAt).toLocaleDateString();
+  const reservedDate = formatPacificDate(reservation.reservedAt);
   const returnedDate = reservation.returnedAt
-    ? new Date(reservation.returnedAt).toLocaleDateString()
+    ? formatPacificDate(reservation.returnedAt)
     : null;
 
   return (
@@ -89,7 +90,7 @@ export default function ReservationCard({
           <span className="text-gray-600">Event Date:</span>
           <span className="font-medium text-gray-900">
             {reservation.event?.eventDate
-              ? new Date(reservation.event.eventDate).toLocaleDateString()
+              ? formatPacificDate(reservation.event.eventDate)
               : "N/A"}
           </span>
         </div>

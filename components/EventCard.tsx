@@ -3,11 +3,11 @@
 import { deleteEvent, updateEvent } from "@/actions/inventory";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-function formatForDateTimeLocal(input: Date) {
-  const date = new Date(input.getTime() - input.getTimezoneOffset() * 60000);
-  return date.toISOString().slice(0, 16);
-}
+import {
+  formatPacificDate,
+  formatPacificDateTimeLocalValue,
+  formatPacificTime,
+} from "@/lib/time";
 
 type EventCardProps = {
   event: {
@@ -28,7 +28,7 @@ export default function EventCard({ event }: EventCardProps) {
   const [formValues, setFormValues] = useState({
     name: event.name,
     description: event.description ?? "",
-    eventDate: formatForDateTimeLocal(parsedEventDate),
+    eventDate: formatPacificDateTimeLocalValue(parsedEventDate),
     location: event.location ?? "",
   });
 
@@ -50,7 +50,7 @@ export default function EventCard({ event }: EventCardProps) {
     setFormValues({
       name: event.name,
       description: event.description ?? "",
-      eventDate: formatForDateTimeLocal(new Date(event.eventDate)),
+      eventDate: formatPacificDateTimeLocalValue(new Date(event.eventDate)),
       location: event.location ?? "",
     });
     setIsEditing(true);
@@ -77,15 +77,16 @@ export default function EventCard({ event }: EventCardProps) {
     }
   }
 
-  const formattedDate = parsedEventDate.toLocaleDateString("en-US", {
+  const formattedDate = formatPacificDate(parsedEventDate, {
     weekday: "short",
     year: "numeric",
     month: "short",
     day: "numeric",
   });
-  const formattedTime = parsedEventDate.toLocaleTimeString("en-US", {
+  const formattedTime = formatPacificTime(parsedEventDate, {
     hour: "2-digit",
     minute: "2-digit",
+    timeZoneName: "short",
   });
 
   if (isEditing) {
@@ -216,7 +217,12 @@ export default function EventCard({ event }: EventCardProps) {
       </div>
 
       {event.description && (
-        <p className="text-sm text-gray-600 mb-3">{event.description}</p>
+        <details className="mb-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+          <summary className="cursor-pointer text-xs font-semibold text-slate-700">
+            Show description
+          </summary>
+          <p className="mt-2 text-sm text-slate-600 whitespace-pre-wrap">{event.description}</p>
+        </details>
       )}
 
       <div className="space-y-2 text-sm">

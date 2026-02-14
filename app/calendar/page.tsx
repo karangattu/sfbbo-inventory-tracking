@@ -1,9 +1,11 @@
 import { getEvents, getReservations, getItems } from "@/actions/inventory";
 import CalendarView from "@/components/CalendarView";
-
-function toDateKey(d: Date) {
-  return d.toISOString().slice(0, 10);
-}
+import {
+  formatPacificDate,
+  getPacificYearMonth,
+  pacificDateKeyFromParts,
+  toPacificDateKey,
+} from "@/lib/time";
 
 export type CalendarDayData = {
   date: number;
@@ -26,24 +28,24 @@ export default async function CalendarPage({
   ]);
 
   const now = new Date();
-  const qsYear = resolvedSearchParams.year ? parseInt(resolvedSearchParams.year, 10) : now.getFullYear();
-  const qsMonth = resolvedSearchParams.month ? parseInt(resolvedSearchParams.month, 10) - 1 : now.getMonth();
+  const pacificNow = getPacificYearMonth(now);
+  const qsYear = resolvedSearchParams.year ? parseInt(resolvedSearchParams.year, 10) : pacificNow.year;
+  const qsMonth = resolvedSearchParams.month ? parseInt(resolvedSearchParams.month, 10) - 1 : pacificNow.monthZeroBased;
   const filterEventId = resolvedSearchParams.eventId ? parseInt(resolvedSearchParams.eventId, 10) : undefined;
   const filterItemId = resolvedSearchParams.itemId ? parseInt(resolvedSearchParams.itemId, 10) : undefined;
 
   const year = qsYear;
   const month = qsMonth;
 
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const daysInMonth = lastDay.getDate();
-  const startDayOfWeek = firstDay.getDay(); // 0=Sun .. 6=Sat
+  const firstDayUtc = new Date(Date.UTC(year, month, 1));
+  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  const startDayOfWeek = firstDayUtc.getUTCDay(); // 0=Sun .. 6=Sat
 
   const events = filterEventId ? allEvents.filter((e) => e.id === filterEventId) : allEvents;
 
   const eventsByDate: Record<string, any[]> = {};
   events.forEach((ev) => {
-    const key = toDateKey(new Date(ev.eventDate));
+    const key = toPacificDateKey(ev.eventDate);
     eventsByDate[key] = eventsByDate[key] || [];
     eventsByDate[key].push(ev);
   });
@@ -51,18 +53,19 @@ export default async function CalendarPage({
   const reservationsByDate: Record<string, any[]> = {};
   reservations.forEach((r) => {
     if (!r.event?.eventDate) return;
-    const evDate = new Date(r.event.eventDate);
-    if (evDate.getFullYear() !== year || evDate.getMonth() !== month) return;
+    const evDate = r.event.eventDate;
+    const pacificEventDate = getPacificYearMonth(evDate);
+    if (pacificEventDate.year !== year || pacificEventDate.monthZeroBased !== month) return;
     if (filterEventId && r.event?.id !== filterEventId) return;
     if (filterItemId && r.item?.id !== filterItemId) return;
 
-    const key = toDateKey(evDate);
+    const key = toPacificDateKey(evDate);
     reservationsByDate[key] = reservationsByDate[key] || [];
     reservationsByDate[key].push(r);
   });
 
   // Build calendar grid with proper weekday alignment
-  const todayKey = toDateKey(now);
+  const todayKey = toPacificDateKey(now);
   const calendarDays: CalendarDayData[] = [];
 
   // Empty cells before the 1st
@@ -72,8 +75,7 @@ export default async function CalendarPage({
 
   // Actual days
   for (let d = 1; d <= daysInMonth; d++) {
-    const dateObj = new Date(year, month, d);
-    const key = toDateKey(dateObj);
+    const key = pacificDateKeyFromParts(year, month, d);
     const dayEvents = eventsByDate[key] || [];
     const dayReservations = reservationsByDate[key] || [];
 
@@ -91,8 +93,8 @@ export default async function CalendarPage({
     });
   }
 
-  const prev = new Date(year, month - 1, 1);
-  const next = new Date(year, month + 1, 1);
+  const prev = new Date(Date.UTC(year, month - 1, 1));
+  const next = new Date(Date.UTC(year, month + 1, 1));
 
   const buildHref = (y: number, m0: number) => {
     const params = new URLSearchParams();
@@ -103,7 +105,10 @@ export default async function CalendarPage({
     return `/calendar?${params.toString()}`;
   };
 
-  const monthLabel = firstDay.toLocaleString("en-US", { month: "long", year: "numeric" });
+  const monthLabel = formatPacificDate(new Date(Date.UTC(year, month, 15)), {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <CalendarView
@@ -111,8 +116,8 @@ export default async function CalendarPage({
       monthLabel={monthLabel}
       year={year}
       month={month}
-      prevHref={buildHref(prev.getFullYear(), prev.getMonth())}
-      nextHref={buildHref(next.getFullYear(), next.getMonth())}
+      prevHref={buildHref(prev.getUTCFullYear(), prev.getUTCMonth())}
+      nextHref={buildHref(next.getUTCFullYear(), next.getUTCMonth())}
       allEvents={allEvents.map((e) => ({ id: e.id, name: e.name }))}
       items={items.map((i) => ({ id: i.id, name: i.name }))}
       filterEventId={filterEventId}

@@ -2,6 +2,7 @@
 
 import { createReservation, getItems, getEvents, getAvailableQuantity } from "@/actions/inventory";
 import { useState, useEffect } from "react";
+import { formatPacificDate } from "@/lib/time";
 
 export default function CreateReservationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -117,7 +118,7 @@ export default function CreateReservationForm() {
           <select id="eventId" name="eventId" required className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">Select an event</option>
             {events.map((event) => (
-              <option key={event.id} value={event.id}>{event.name} ({new Date(event.eventDate).toLocaleDateString()})</option>
+              <option key={event.id} value={event.id}>{event.name} ({formatPacificDate(event.eventDate)})</option>
             ))}
           </select>
         </div>
